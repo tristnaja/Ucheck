@@ -3,7 +3,9 @@ package main
 import (
 	"fmt"
 	"log"
-	"sync"
+	"os"
+
+	"github.com/tristnaja/Ucheck/cmd"
 )
 
 func main() {
@@ -16,36 +18,15 @@ func main() {
 		"https://nonexistent.site.example", // Err Test
 	}
 
-	numJob := len(urls)
-	numWorker := 3
-	jobs := make(chan Job, numJob)
-	results := make(chan Result, numJob)
-	var wg sync.WaitGroup
-
-	for i := 1; i <= numWorker; i++ {
-		wg.Add(1)
-		go worker(i, jobs, results, &wg)
+	if len(os.Args) < 1 {
+		fmt.Fprintf(os.Stderr, "usage: ucheck <cmd> <args>")
+		log.Fatal("parsing args: arguments not enough")
 	}
 
-	for index, url := range urls {
-		job := Job{
-			ID:  index,
-			URL: url,
-		}
-
-		jobs <- job
-	}
-
-	close(jobs)
-	wg.Wait()
-	close(results)
-
-	fmt.Println("\n-+-+-+-Final Report-+-+-+-")
-	for res := range results {
-		if res.Error != nil {
-			log.Fatalf("Job ID: %d | URL: %v | (FAILED): %v\n", res.JobID, res.URL, res.Error)
-		} else {
-			fmt.Printf("Job ID: %d | URL: %v | (SUCCESS) Status Code: %v\n", res.JobID, res.URL, res.StatusCode)
-		}
+	switch os.Args[1] {
+	case "run":
+		cmd.RunExecute(urls)
+	default:
+		log.Fatal("unknown command, usable: run, add, delete, deleteAll")
 	}
 }
