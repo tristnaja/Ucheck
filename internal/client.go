@@ -1,4 +1,4 @@
-package cmd
+package internal
 
 import (
 	"fmt"
@@ -20,7 +20,7 @@ type Result struct {
 	Error      error
 }
 
-func worker(id int, jobs <-chan Job, results chan<- Result, wg *sync.WaitGroup) {
+func Worker(id int, jobs <-chan Job, results chan<- Result, wg *sync.WaitGroup) {
 	defer wg.Done()
 
 	for job := range jobs {
