@@ -55,7 +55,23 @@ func RunCheck(filePath string) error {
 		}
 	}
 
+	err = CleanUp(filePath)
+
+	if err != nil {
+		return fmt.Errorf("cleaning up: %w", err)
+	}
+
 	return nil
+}
+
+func ReadDatabase(filePath string) (*Database, error) {
+	db, err := readJSON(filePath)
+
+	if err != nil {
+		return nil, fmt.Errorf("opening database: %w", err)
+	}
+
+	return db, nil
 }
 
 func AddURL(url string, filePath string) error {
@@ -80,6 +96,25 @@ func AddURL(url string, filePath string) error {
 
 	if err != nil {
 		return fmt.Errorf("saving url: %w", err)
+	}
+
+	return nil
+}
+
+func CleanUp(filePath string) error {
+	db, err := readJSON(filePath)
+
+	if err != nil {
+		return fmt.Errorf("something happenend during cleanup: %w", err)
+	}
+
+	db.URLs = []string{`add your link with "ucheck add -u <url>"`}
+	db.Size = 0
+
+	err = writeJSON(filePath, *db)
+
+	if err != nil {
+		return fmt.Errorf("something happenend during cleanup: %w", err)
 	}
 
 	return nil

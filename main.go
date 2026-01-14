@@ -32,9 +32,11 @@ func main() {
 
 	switch os.Args[1] {
 	case "run":
-		cmd.RunExecute(filePath)
+		err = cmd.RunExecute(filePath)
 	case "add":
 		err = cmd.RunAdd(os.Args[2:], filePath)
+	case "list":
+		err = cmd.RunList(filePath)
 	default:
 		log.Fatal("unknown command, usable: run, add, delete, deleteAll")
 	}
