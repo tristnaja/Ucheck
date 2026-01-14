@@ -31,7 +31,7 @@ func RunAdd(args []string, filePath string) error {
 		return err
 	}
 
-	fmt.Printf("Successfully add new URL: %v", url)
+	fmt.Printf("Successfully add new URL: %v\n", url)
 
 	return nil
 }

@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"path/filepath"
 	"sync"
 )
 
@@ -58,6 +59,14 @@ func RunCheck(filePath string) error {
 }
 
 func AddURL(url string, filePath string) error {
+	dir := filepath.Dir(filePath)
+
+	err := os.MkdirAll(dir, 0755)
+
+	if err != nil {
+		return fmt.Errorf("creating database dir: %w", err)
+	}
+
 	db, err := readJSON(filePath)
 
 	if err != nil {

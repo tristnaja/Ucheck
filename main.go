@@ -22,12 +22,6 @@ func main() {
 	dbDir := filepath.Join(cfgRoot, "ucheck")
 	filePath := filepath.Join(dbDir, "db.json")
 
-	// urls := []string{
-	// 	"https://google.com", "https://github.com",
-	// 	"https://go.dev", "https://stackoverflow.com",
-	// 	"https://nonexistent.site.example", // Err Test
-	// }
-
 	if len(os.Args) < 1 && os.Args[1] == "run" {
 		fmt.Fprintf(os.Stderr, "usage: ucheck run")
 		log.Fatal("error occured: ucheck run does not need any arguments")
