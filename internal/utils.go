@@ -54,9 +54,6 @@ func RunCheck(filePath string) error {
 	wg.Wait()
 	close(results)
 
-	fmt.Println(db.Size)
-	fmt.Println(len(db.URLs))
-
 	fmt.Println("\n-+-+-+-Final Report-+-+-+-")
 	for res := range results {
 		if res.Error != nil {
