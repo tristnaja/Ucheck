@@ -8,6 +8,7 @@ import (
 	"net/url"
 	"os"
 	"path/filepath"
+	"strings"
 	"sync"
 )
 
@@ -35,19 +36,15 @@ func RunCheck(filePath string) error {
 	}
 
 	for index, link := range db.URLs {
-		parsedURL, err := url.Parse(link)
-
-		if parsedURL.Scheme == "" {
-			parsedURL.Scheme = "https"
-		}
+		formattedURL, err := formatURL(link)
 
 		if err != nil {
-			continue
+			return err
 		}
 
 		job := Job{
 			ID:  index,
-			URL: parsedURL.String(),
+			URL: formattedURL,
 		}
 
 		jobs <- job
@@ -122,7 +119,7 @@ func CleanUp(filePath string) error {
 		return fmt.Errorf("something happenend during cleanup: %w", err)
 	}
 
-	db.URLs = []string{`add your link with "ucheck add -u <url>"`}
+	db.URLs = []string{}
 	db.Size = 0
 
 	err = writeJSON(filePath, *db)
@@ -179,4 +176,24 @@ func readJSON(filePath string) (*Database, error) {
 	}
 
 	return &result, nil
+}
+
+func formatURL(link string) (string, error) {
+	input := strings.TrimSpace(link)
+
+	if !strings.Contains(input, "https://") && !strings.Contains(input, "http://") {
+		fmt.Println("the link provided does not include any scheme (http/https)")
+		fmt.Println("will default to https://")
+		fmt.Printf("link: %v\n", input)
+		input = "https://" + input
+		fmt.Printf("defaulted to: %v\n\n", input)
+	}
+
+	parsedURL, err := url.Parse(input)
+
+	if err != nil {
+		return "", fmt.Errorf("parsing url: %w", err)
+	}
+
+	return parsedURL.String(), nil
 }
