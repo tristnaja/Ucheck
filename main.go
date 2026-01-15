@@ -32,7 +32,7 @@ func main() {
 
 	switch os.Args[1] {
 	case "run":
-		err = cmd.RunExecute(filePath)
+		cmd.RunExecute(filePath)
 	case "add":
 		err = cmd.RunAdd(os.Args[2:], filePath)
 	case "list":

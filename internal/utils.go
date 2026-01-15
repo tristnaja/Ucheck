@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"net/url"
 	"os"
 	"path/filepath"
 	"sync"
@@ -22,7 +23,7 @@ func RunCheck(filePath string) error {
 		return err
 	}
 
-	numJob := db.Size
+	numJob := len(db.URLs)
 	numWorker := 3
 	jobs := make(chan Job, numJob)
 	results := make(chan Result, numJob)
@@ -33,10 +34,20 @@ func RunCheck(filePath string) error {
 		go Worker(i, jobs, results, &wg)
 	}
 
-	for index, url := range db.URLs {
+	for index, link := range db.URLs {
+		parsedURL, err := url.Parse(link)
+
+		if parsedURL.Scheme == "" {
+			parsedURL.Scheme = "https"
+		}
+
+		if err != nil {
+			continue
+		}
+
 		job := Job{
 			ID:  index,
-			URL: url,
+			URL: parsedURL.String(),
 		}
 
 		jobs <- job
@@ -45,6 +56,9 @@ func RunCheck(filePath string) error {
 	close(jobs)
 	wg.Wait()
 	close(results)
+
+	fmt.Println(db.Size)
+	fmt.Println(len(db.URLs))
 
 	fmt.Println("\n-+-+-+-Final Report-+-+-+-")
 	for res := range results {
